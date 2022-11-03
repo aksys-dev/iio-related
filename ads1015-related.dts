@@ -1,0 +1,170 @@
+jsl_i2c_int: jsl_i2c_int {
+		mux {
+			pins = "gpio67"; 
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio67"; 
+			drive-strength = <2>;
+			bias-pull-down;
+            input-enable;
+		};
+	};
+    
+    jsr_i2c_int: jsr_i2c_int {
+        mux {
+            pins = "gpio71"; 
+            function = "gpio";
+        };
+
+        config {
+            pins = "gpio71"; 
+            drive-strength = <2>;
+            bias-pull-down;
+            input-enable;
+        };
+    };
+
+&qupv3_se10_i2c {
+    status = "ok";
+
+    adcl: adc@48 {
+        compatible = "ti,ads1015";
+        reg = <0x48>;
+        ti,vdd-supply = <&L3N>;
+        regulator-name = "ti,vdd";
+        #address-cells = <1>;
+        #size-cells = <0>;
+        #io-channel-cells = <1>;
+
+        pinctrl-names = "default";
+		pinctrl-0 = <&jsl_i2c_int>;
+        interrupt-parent = <&tlmm>;
+        interrupts = <67 4>;
+
+        channel@4 {
+            reg = <4>;
+            ti,gain = <2>;
+            ti,datarate = <6>;
+        };
+
+        channel@5 {
+            reg = <5>;
+            ti,gain = <2>;
+            ti,datarate = <6>;
+        };
+
+        channel@6 {
+            reg = <6>;
+            ti,gain = <1>;
+            ti,datarate = <6>;
+        };
+    };
+};
+
+&qupv3_se11_i2c {
+    status = "ok";
+
+    adcr: adc@48 {
+        compatible = "ti,ads1015";
+        reg = <0x48>;
+        ti,vdd-supply = <&L3N>;
+        regulator-name = "ti,vdd";
+        #address-cells = <1>;
+        #size-cells = <0>;
+        #io-channel-cells = <1>;
+
+        pinctrl-names = "default";
+		pinctrl-0 = <&jsr_i2c_int>;
+        interrupt-parent = <&tlmm>;
+        interrupts = <71 4>;
+
+        channel@4 {
+            reg = <4>; 
+            ti,gain = <2>;
+            ti,datarate = <6>;
+        };
+
+        channel@5 {
+            reg = <5>;
+            ti,gain = <2>;
+            ti,datarate = <6>;
+        };
+
+        channel@6 {
+            reg = <6>;
+            ti,gain = <1>;
+            ti,datarate = <6>;
+        };
+    };
+};
+
+
+&soc {
+	joystick_l: js-l {
+		status = "ok";
+		compatible = "adc-joystick";
+
+		io-channels = <&adcl 4>, <&adcl 5>, <&adcl 6>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		axis@0 {
+			reg = <0>;
+			linux,code = <ABS_X>;
+			abs-range = <510 0>;
+			abs-fuzz = <10>;
+			abs-flat = <10>;
+		};
+
+		axis@1 {
+			reg = <1>;
+			linux,code = <ABS_Y>;
+			abs-range = <0 510>;
+			abs-fuzz = <10>;
+			abs-flat = <10>;
+		};
+
+		axis@2 {
+			reg = <2>;
+			linux,code = <ABS_HAT2Y>;
+			abs-range = <0 255>;
+			abs-fuzz = <10>;
+			abs-flat = <10>;
+		};
+	};
+    
+	joystick_r: js-r {
+		status = "ok";
+		compatible = "adc-joystick";
+
+		io-channels = <&adcr 4>, <&adcr 5>, <&adcr 6>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+        axis@0 {
+            reg = <0>;
+            linux,code = <ABS_RX>;
+            abs-range = <510 0>;
+            abs-fuzz = <10>;
+            abs-flat = <10>;
+        };
+
+        axis@1 {
+            reg = <1>;
+            linux,code = <ABS_RY>;
+            abs-range = <0 510>;
+            abs-fuzz = <10>;
+            abs-flat = <10>;
+        };
+
+        axis@2 {
+            reg = <2>;
+            linux,code = <ABS_HAT2X>;
+            abs-range = <0 255>;
+            abs-fuzz = <10>;
+            abs-flat = <10>;
+        };
+	};
+};
